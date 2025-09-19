@@ -1,0 +1,54 @@
+# Prometheus Application Manifest
+# This is the permanent, unique identifier for your application.
+namespace: io.github.jneums.ratestream
+
+# This section contains all data for a specific version. This entire package will be submitted for review and locked to the audit of this version.
+submission:
+  # --- Core App Information ---
+  name: RateStream
+  description: A high-performance, on-chain oracle that delivers real-time and historical exchange rates directly from the IC's official Exchange Rate Canister (XRC). Built for AI agents, DeFi protocols, and any smart contract that needs trustworthy financial data.
+  publisher: Atlas Labs
+  category: Data & Oracles
+
+  # --- Technical & Marketing Details ---
+  repo_url: 'https://github.com/jneums/ratestream'
+  mcp_path: /mcp
+  why_this_app: Smart contracts require financial data they can trust. Off-chain APIs introduce centralization and security risks, while the native XRC requires complex cycle management for every call. RateStream solves both problems by acting as a simple, verifiable bridge to the official XRC. It provides a standardized MCP interface that handles cycle payments automatically, making on-chain financial data easily and reliably accessible to the entire ecosystem.
+  key_features:
+    - "Powered by the Official XRC: All data is sourced directly from the Internet Computer's canonical Exchange Rate Canister for maximum trust."
+    - "Simplified Cycle Management: The required 1B cycle deposit for XRC calls is handled automatically, abstracting away complexity."
+    - "Broad Asset Support: Get rates for any combination of cryptocurrency (ICP, BTC, ETH) and fiat (USD, EUR, JPY) assets."
+    - "Historical Data: Request exchange rates for any point in time by providing an optional timestamp."
+    - "Standardized MCP Tool Call: A simple, predictable interface for easy integration with AI agents and other smart contracts."
+  tags:
+    - exchange-rate
+    - oracle
+    - data
+    - api
+    - xrc
+    - price-feed
+    - on-chain
+    - verifiable
+    - defi
+    - finance
+    - developer-tools
+    - ai-agent
+    - icp
+    - btc
+    - eth
+    - usd
+
+  # --- Visuals (Replace with your actual asset URLs) ---
+  visuals:
+    icon_url: 'https://placehold.co/512x512/1A1A1A/FFFFFF/png?text=RS'
+    banner_url: 'https://placehold.co/1200x630/1A1A1A/FFFFFF/png?text=RateStream'
+    gallery_images: []
+
+  # --- BUILD-SPECIFIC - YOU MUST FILL THESE OUT BEFORE PUBLISHING ---
+  # The full commit hash of the version you are publishing.
+  # Run `git rev-parse HEAD` to get this value.
+  git_commit: ''
+
+  # The path to the compiled WASM file for this canister.
+  # This is typically found in `.dfx/local/canisters/<canister_name>/<canister_name>.wasm`
+  wasm_path: .dfx/local/canisters/ratestream/ratestream.wasm

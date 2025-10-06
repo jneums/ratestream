@@ -1,25 +1,23 @@
 # Prometheus Application Manifest
-# This is the permanent, unique identifier for your application.
 namespace: io.github.jneums.ratestream
 
-# This section contains all data for a specific version. This entire package will be submitted for review and locked to the audit of this version.
 submission:
   # --- Core App Information ---
   name: RateStream
-  description: A high-performance, on-chain oracle that delivers real-time and historical exchange rates directly from the IC's official Exchange Rate Canister (XRC). Built for AI agents.
+  description: An on-chain price oracle for AI agents. Provides trusted, real-time financial data from the IC's native XRC via a simple MCP tool.
   publisher: Atlas Labs
   category: Data & Oracles
 
   # --- Technical & Marketing Details ---
   repo_url: 'https://github.com/jneums/ratestream'
   mcp_path: /mcp
-  why_this_app: AI Agents require financial data they can trust. Off-chain APIs introduce centralization and security risks, while the native XRC requires complex cycle management for every call. RateStream solves both problems by acting as a simple, verifiable bridge to the official XRC. It provides a standardized MCP interface that handles cycle payments automatically, making on-chain financial data easily and reliably accessible to the entire ecosystem.
+  why_this_app: AI agents need trusted financial data. RateStream provides it by wrapping the IC's native XRC into a simple, secure MCP tool. It abstracts away the complexity of cycle management, making on-chain price feeds plug-and-play for any agent.
   key_features:
-    - "Powered by the Official XRC: All data is sourced directly from the Internet Computer's canonical Exchange Rate Canister for maximum trust."
-    - "Simplified Cycle Management: The required 1B cycle deposit for XRC calls is handled automatically, abstracting away complexity."
-    - "Broad Asset Support: Get rates for any combination of cryptocurrency (ICP, BTC, ETH) and fiat (USD, EUR, JPY) assets."
-    - "Historical Data: Request exchange rates for any point in time by providing an optional timestamp."
-    - "Standardized MCP Tool Call: A simple, predictable interface for easy integration with AI agents and other smart contracts."
+    - "Plug-and-Play MCP Tool: A simple, standardized interface for any AI agent."
+    - "Trusted On-Chain Data: Powered directly by the IC's native Exchange Rate Canister (XRC)."
+    - "Historical Rates: Query prices from any point in time for analysis or backtesting."
+    - "Automated Cycle Management: Abstracts away the complexity and cost of XRC calls."
+    - "Broad Asset Support: Get rates for crypto (ICP, BTC, ETH) and fiat (USD, EUR, JPY)."
   tags:
     - exchange-rate
     - oracle
@@ -33,22 +31,20 @@ submission:
     - finance
     - developer-tools
     - ai-agent
+    - agent
+    - llm
+    - tool-use
     - icp
     - btc
     - eth
     - usd
 
-  # --- Visuals (Replace with your actual asset URLs) ---
+  # --- Visuals ---
   visuals:
     icon_url: https://github.com/jneums/ratestream/releases/download/v1.0.0-assets/icon-ratestream.png
     banner_url: https://github.com/jneums/ratestream/releases/download/v1.0.0-assets/banner-ratestream.png
     gallery_images: [https://github.com/jneums/ratestream/releases/download/v1.0.0-assets/banner-ratestream.png]
 
-  # --- BUILD-SPECIFIC - YOU MUST FILL THESE OUT BEFORE PUBLISHING ---
-  # The full commit hash of the version you are publishing.
-  # Run `git rev-parse HEAD` to get this value.
-  git_commit: 3443c0ae31690ce214549ccc83c64a8bcf4e18c1
-
-  # The path to the compiled WASM file for this canister.
-  # This is typically found in `.dfx/local/canisters/<canister_name>/<canister_name>.wasm`
+  # --- BUILD-SPECIFIC ---
+  git_commit: 214150a9ac0e306e5d7927e7354eaec674e5de1f
   wasm_path: .dfx/local/canisters/my_mcp_server/my_mcp_server.wasm

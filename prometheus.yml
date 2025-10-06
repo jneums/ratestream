@@ -40,15 +40,15 @@ submission:
 
   # --- Visuals (Replace with your actual asset URLs) ---
   visuals:
-    icon_url: 'https://placehold.co/512x512/1A1A1A/FFFFFF/png?text=RS'
-    banner_url: 'https://placehold.co/1200x630/1A1A1A/FFFFFF/png?text=RateStream'
-    gallery_images: []
+    icon_url: https://github.com/jneums/ratestream/releases/download/v1.0.0-assets/icon-ratestream.png
+    banner_url: https://github.com/jneums/ratestream/releases/download/v1.0.0-assets/banner-ratestream.png
+    gallery_images: [https://github.com/jneums/ratestream/releases/download/v1.0.0-assets/banner-ratestream.png]
 
   # --- BUILD-SPECIFIC - YOU MUST FILL THESE OUT BEFORE PUBLISHING ---
   # The full commit hash of the version you are publishing.
   # Run `git rev-parse HEAD` to get this value.
-  git_commit: ''
+  git_commit: b1d1f4b45d49910b80a9910f4f8f937233611cc4
 
   # The path to the compiled WASM file for this canister.
   # This is typically found in `.dfx/local/canisters/<canister_name>/<canister_name>.wasm`
-  wasm_path: .dfx/local/canisters/ratestream/ratestream.wasm
+  wasm_path: .dfx/local/canisters/my_mcp_server/my_mcp_server.wasm

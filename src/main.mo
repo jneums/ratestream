@@ -4,10 +4,10 @@ import Blob "mo:base/Blob";
 import Debug "mo:base/Debug";
 import Principal "mo:base/Principal";
 import Option "mo:base/Option";
+import Int "mo:base/Int";
+import Time "mo:base/Time";
 
 import HttpTypes "mo:http-types";
-import Map "mo:map/Map";
-import Json "mo:json";
 
 import AuthCleanup "mo:mcp-motoko-sdk/auth/Cleanup";
 import AuthState "mo:mcp-motoko-sdk/auth/State";
@@ -25,7 +25,8 @@ import ApiKey "mo:mcp-motoko-sdk/auth/ApiKey";
 
 import SrvTypes "mo:mcp-motoko-sdk/server/Types";
 
-import IC "mo:ic";
+import ToolContext "tools/ToolContext";
+import get_exchange_rate "tools/get_exchange_rate";
 
 shared ({ caller = deployer }) persistent actor class McpServer(
   args : ?{
@@ -41,8 +42,12 @@ shared ({ caller = deployer }) persistent actor class McpServer(
   var stable_http_assets : HttpAssets.StableEntries = [];
   transient let http_assets = HttpAssets.init(stable_http_assets);
 
+  // Resource contents stored in memory for simplicity.
+  // In a real application these would probably be uploaded or user generated.
+  var resourceContents = [];
+
   // The application context that holds our state.
-  var appContext : McpTypes.AppContext = State.init([]);
+  var appContext : McpTypes.AppContext = State.init(resourceContents);
 
   // =================================================================================
   // --- OPT-IN: MONETIZATION & AUTHENTICATION ---
@@ -57,7 +62,7 @@ shared ({ caller = deployer }) persistent actor class McpServer(
   // --- UNCOMMENT THIS BLOCK TO ENABLE AUTHENTICATION ---
 
   // let issuerUrl = "https://bfggx-7yaaa-aaaai-q32gq-cai.icp0.io";
-  // let allowanceUrl = "https://prometheusprotocol.org/connections";
+  // let allowanceUrl = "https://prometheusprotocol.org/app/io.github.jneums.ratestream";
   // let requiredScopes = ["openid"];
 
   // //function to transform the response for jwks client
@@ -73,6 +78,7 @@ shared ({ caller = deployer }) persistent actor class McpServer(
   // // Initialize the auth context with the issuer URL and required scopes.
   // transient let authContext : ?AuthTypes.AuthContext = ?AuthState.init(
   //   Principal.fromActor(self),
+  //   owner,
   //   issuerUrl,
   //   requiredScopes,
   //   transformJwksResponse,
@@ -86,16 +92,14 @@ shared ({ caller = deployer }) persistent actor class McpServer(
   // This helps the Prometheus Protocol DAO understand ecosystem growth.
   // =================================================================================
 
-  transient let beaconContext : ?Beacon.BeaconContext = null;
+  // transient let beaconContext : ?Beacon.BeaconContext = null;
 
   // --- UNCOMMENT THIS BLOCK TO ENABLE THE BEACON ---
-  /*
   let beaconCanisterId = Principal.fromText("m63pw-fqaaa-aaaai-q33pa-cai");
   transient let beaconContext : ?Beacon.BeaconContext = ?Beacon.init(
-      beaconCanisterId, // Public beacon canister ID
-      1 * 60 * 60, // Send a beacon every 1 hour
+    beaconCanisterId, // Public beacon canister ID
+    ?(15 * 60), // Send a beacon every 15 minutes
   );
-  */
   // --- END OF BEACON BLOCK ---
 
   // --- Timers ---
@@ -113,49 +117,15 @@ shared ({ caller = deployer }) persistent actor class McpServer(
     case (null) { Debug.print("Beacon is disabled.") };
   };
 
-  transient let tools : [McpTypes.Tool] = [{
-    name = "get_weather";
-    title = ?"Weather Provider";
-    description = ?"Get current weather information for a location";
-    inputSchema = Json.obj([
-      ("type", Json.str("object")),
-      ("properties", Json.obj([("location", Json.obj([("type", Json.str("string")), ("description", Json.str("City name or zip code"))]))])),
-      ("required", Json.arr([Json.str("location")])),
-    ]);
-    outputSchema = ?Json.obj([
-      ("type", Json.str("object")),
-      ("properties", Json.obj([("report", Json.obj([("type", Json.str("string")), ("description", Json.str("The textual weather report."))]))])),
-      ("required", Json.arr([Json.str("report")])),
-    ]);
+  // --- 1. DEFINE YOUR RESOURCES & TOOLS ---
+  transient let resources : [McpTypes.Resource] = [];
 
-    payment = null; // No payment required, this tool is free to use.
-    // To require payment, set the `payment` field like this:
-    // payment = ?{
-    //   ledger = Principal.fromText("vizcg-th777-77774-qaaea-cai"); // ICRC2 Ledger canister ID
-    //   amount = 10_000; // Amount in e8s (1 ICP)
-    // };
-  }];
+  transient let tools : [McpTypes.Tool] = [get_exchange_rate.config()];
 
-  // --- 2. DEFINE YOUR TOOL LOGIC ---
-  // The `auth` parameter will be `null` if auth is disabled or if the user is anonymous.
-  // It will contain user info if auth is enabled and the user provides a valid token.
-  func getWeatherTool(args : McpTypes.JsonValue, auth : ?AuthTypes.AuthInfo, cb : (Result.Result<McpTypes.CallToolResult, McpTypes.HandlerError>) -> ()) : async () {
-    let location = switch (Result.toOption(Json.getAsText(args, "location"))) {
-      case (?loc) { loc };
-      case (null) {
-        return cb(#ok({ content = [#text({ text = "Missing 'location' arg." })]; isError = true; structuredContent = null }));
-      };
-    };
-
-    // The human-readable report.
-    let report = "The weather in " # location # " is sunny.";
-
-    // Build the structured JSON payload that matches our outputSchema.
-    let structuredPayload = Json.obj([("report", Json.str(report))]);
-    let stringified = Json.stringify(structuredPayload, null);
-
-    // Return the full, compliant result.
-    cb(#ok({ content = [#text({ text = stringified })]; isError = false; structuredContent = ?structuredPayload }));
+  transient let toolContext : ToolContext.ToolContext = {
+    canisterPrincipal = Principal.fromActor(self);
+    owner = owner;
+    exchangeRateCanisterId = Principal.fromText("uf6dk-hyaaa-aaaaq-qaaaq-cai");
   };
 
   // --- 3. CONFIGURE THE SDK ---
@@ -165,16 +135,14 @@ shared ({ caller = deployer }) persistent actor class McpServer(
     // allowanceUrl = ?allowanceUrl; // Uncomment this line if using paid tools.
     serverInfo = {
       name = "io.github.jneums.ratestream";
-      title = "RateStream";
-      version = "0.1.0";
+      title = "ICP Exchange Rate Service";
+      version = "0.2.0";
     };
-    resources = [];
-    resourceReader = func(uri) {
-      null;
-    };
+    resources = resources;
+    resourceReader = func(uri) { null };
     tools = tools;
     toolImplementations = [
-      ("get_weather", getWeatherTool),
+      ("get_exchange_rate", get_exchange_rate.handle(toolContext)),
     ];
     beacon = beaconContext;
   };
@@ -183,6 +151,9 @@ shared ({ caller = deployer }) persistent actor class McpServer(
   transient let mcpServer = Mcp.createServer(mcpConfig);
 
   // --- PUBLIC ENTRY POINTS ---
+
+  // Do not remove these public methods below. They are required for the MCP Registry and MCP Orchestrator
+  // to manage the canister upgrades and installs, handle payments, and allow owner only methods.
 
   /// Get the current owner of the canister.
   public query func get_owner() : async Principal { return owner };
@@ -352,5 +323,22 @@ shared ({ caller = deployer }) persistent actor class McpServer(
         return ApiKey.list_my_api_keys(ctx, msg.caller);
       };
     };
+  };
+
+  public type UpgradeFinishedResult = {
+    #InProgress : Nat;
+    #Failed : (Nat, Text);
+    #Success : Nat;
+  };
+  private func natNow() : Nat {
+    return Int.abs(Time.now());
+  };
+  /* Return success after post-install/upgrade operations complete.
+   * The Nat value is a timestamp (in nanoseconds) of when the upgrade finished.
+   * If the upgrade is still in progress, return #InProgress with a timestamp of when it started.
+   * If the upgrade failed, return #Failed with a timestamp and an error message.
+   */
+  public func icrc120_upgrade_finished() : async UpgradeFinishedResult {
+    #Success(natNow());
   };
 };

@@ -282,7 +282,8 @@ module {
           timestamp = timestamp_opt;
         };
 
-        let result = await exchangeRateCanister.get_exchange_rate(request);
+        let CYCLES_AMOUNT : Nat = 1_000_000_000; // 1 Billion cycles required by XRC
+        let result = await (with cycles = CYCLES_AMOUNT) exchangeRateCanister.get_exchange_rate(request);
 
         switch (result) {
           case (#Ok(rate)) {

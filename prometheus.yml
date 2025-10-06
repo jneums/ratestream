@@ -6,14 +6,14 @@ namespace: io.github.jneums.ratestream
 submission:
   # --- Core App Information ---
   name: RateStream
-  description: A high-performance, on-chain oracle that delivers real-time and historical exchange rates directly from the IC's official Exchange Rate Canister (XRC). Built for AI agents, DeFi protocols, and any smart contract that needs trustworthy financial data.
+  description: A high-performance, on-chain oracle that delivers real-time and historical exchange rates directly from the IC's official Exchange Rate Canister (XRC). Built for AI agents.
   publisher: Atlas Labs
   category: Data & Oracles
 
   # --- Technical & Marketing Details ---
   repo_url: 'https://github.com/jneums/ratestream'
   mcp_path: /mcp
-  why_this_app: Smart contracts require financial data they can trust. Off-chain APIs introduce centralization and security risks, while the native XRC requires complex cycle management for every call. RateStream solves both problems by acting as a simple, verifiable bridge to the official XRC. It provides a standardized MCP interface that handles cycle payments automatically, making on-chain financial data easily and reliably accessible to the entire ecosystem.
+  why_this_app: AI Agents require financial data they can trust. Off-chain APIs introduce centralization and security risks, while the native XRC requires complex cycle management for every call. RateStream solves both problems by acting as a simple, verifiable bridge to the official XRC. It provides a standardized MCP interface that handles cycle payments automatically, making on-chain financial data easily and reliably accessible to the entire ecosystem.
   key_features:
     - "Powered by the Official XRC: All data is sourced directly from the Internet Computer's canonical Exchange Rate Canister for maximum trust."
     - "Simplified Cycle Management: The required 1B cycle deposit for XRC calls is handled automatically, abstracting away complexity."
@@ -47,7 +47,7 @@ submission:
   # --- BUILD-SPECIFIC - YOU MUST FILL THESE OUT BEFORE PUBLISHING ---
   # The full commit hash of the version you are publishing.
   # Run `git rev-parse HEAD` to get this value.
-  git_commit: b1d1f4b45d49910b80a9910f4f8f937233611cc4
+  git_commit: 3443c0ae31690ce214549ccc83c64a8bcf4e18c1
 
   # The path to the compiled WASM file for this canister.
   # This is typically found in `.dfx/local/canisters/<canister_name>/<canister_name>.wasm`
